@@ -1,14 +1,16 @@
 ﻿using DoctorCase.Entity.Dtos;
+using DoctorCase.Entity.Models;
 using DoctorCase.Service.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DoctorCase
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
@@ -16,6 +18,7 @@ namespace DoctorCase
             var serviceProvider = new ServiceCollection().AddSingleton<IService, DoctorCase.Service.Services.Service>().BuildServiceProvider();
 
             var service = serviceProvider.GetService<IService>();
+
             var doctorListResponse = service.GetDoctorsAsync();
             doctorListResponse.Wait();
 
@@ -80,5 +83,7 @@ namespace DoctorCase
             Console.ReadLine();
 
         }
+
+        
     }
 }

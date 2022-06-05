@@ -29,6 +29,6 @@ namespace DoctorCase.API.Controllers
             return Ok(doctorRoot);
         }
 
-        
+
     }
 }
