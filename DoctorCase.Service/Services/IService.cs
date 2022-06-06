@@ -10,9 +10,9 @@ namespace DoctorCase.Service.Services
         Task<DoctorRoot> GetDoctorsAsync();
         Task<List<Schedule>> GetSchedulesAsync(string id);
         Task<BookRoot> PostBooking(BookDto bookDto);
+        Task<BookRoot> PostCancelBooking(string bookingId);
         Task<DoctorRoot> GetTurkishDoctorsAsync();
-
-        void ExportCSV(DoctorRoot doctorRoot);
+        Task ExportCSV();
 
     }
 }

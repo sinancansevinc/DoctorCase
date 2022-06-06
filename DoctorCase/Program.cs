@@ -14,7 +14,7 @@ namespace DoctorCase
     {
         static void Main(string[] args)
         {
-            
+
             var serviceProvider = new ServiceCollection().AddSingleton<IService, DoctorCase.Service.Services.Service>().BuildServiceProvider();
 
             var service = serviceProvider.GetService<IService>();
@@ -80,10 +80,21 @@ namespace DoctorCase
                 Console.WriteLine(" Your booking id is: " + bookRoot.Result.BookingId);
             }
 
+            Console.WriteLine("Please write booking id to cancel booking");
+            string bookingId = Console.ReadLine();
+
+            var responseCancelBooking = service.PostCancelBooking(bookingId);
+            responseCancelBooking.Wait();
+
+
+            Console.WriteLine("Return status: "+responseCancelBooking.Result.ReturnStatus);
+
+
+
             Console.ReadLine();
 
         }
 
-        
+
     }
 }

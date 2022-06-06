@@ -172,10 +172,11 @@ namespace DoctorCase.Service.Services
             }
         }
 
-        public void ExportCSV(DoctorRoot doctorRoot)
+        public async Task ExportCSV()
         {
             try
             {
+                DoctorRoot doctorRoot = await GetTurkishDoctorsAsync();
                 string[] columnHeaders = new string[] {
                 "Created Date",
                 "Branch Id",
@@ -188,33 +189,24 @@ namespace DoctorCase.Service.Services
                 "DoctorId",
                 };
 
-                ExcelPackage.LicenseContext = LicenseContext.Commercial;
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
                 ExcelPackage excel = new ExcelPackage();
-
-                // name of the sheet
                 var workSheet = excel.Workbook.Worksheets.Add("Doctors");
-
-                // setting the properties
-                // of the work sheet 
                 workSheet.TabColor = System.Drawing.Color.Black;
                 workSheet.DefaultRowHeight = 12;
 
-                // Setting the properties
-                // of the first row
                 workSheet.Row(1).Height = 20;
                 workSheet.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Row(1).Style.Font.Bold = true;
 
-                for (int i = 1; i <=columnHeaders.Length; ++i)
+                for (int i = 1; i <= columnHeaders.Length; ++i)
                 {
-                    
-                    workSheet.Cells[1, i].Value = columnHeaders[i-1];
+                    workSheet.Cells[1, i].Value = columnHeaders[i - 1];
                 }
 
                 int recordIndex = 2;
-                foreach(var item in doctorRoot.DoctorDto)
+                foreach (var item in doctorRoot.DoctorDto)
                 {
                     workSheet.Cells[recordIndex, 1].Value = item.createdAt.ToString();
                     workSheet.Cells[recordIndex, 2].Value = item.branchId;
@@ -233,16 +225,11 @@ namespace DoctorCase.Service.Services
                 if (File.Exists(p_strPath))
                     File.Delete(p_strPath);
 
-                // Create excel file on physical disk 
                 FileStream objFileStrm = File.Create(p_strPath);
                 objFileStrm.Close();
 
-                // Write content to excel file 
                 File.WriteAllBytes(p_strPath, excel.GetAsByteArray());
-                //Close Excel package
                 excel.Dispose();
-
-
 
             }
             catch (Exception e)
@@ -250,6 +237,44 @@ namespace DoctorCase.Service.Services
 
                 throw new Exception(e.Message);
             }
+        }
+
+        public async Task<BookRoot> PostCancelBooking(string bookingId)
+        {
+            BookRoot bookRoot = new BookRoot();
+            var url = "https://4998a4df-5365-4890-812f-093c4d44f87f.mock.pstmn.io/CancelVisit";
+
+            if (string.IsNullOrEmpty(bookingId))
+            {
+                bookRoot.ReturnStatus = false;
+                return bookRoot;
+            }
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    var query = new Dictionary<string, string>()
+                    {
+                        ["BookingId"] = bookingId.ToString()
+                    };
+
+                    var uri = QueryHelpers.AddQueryString(url, query);
+                    var response = await client.PostAsync(uri, null);
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    bookRoot = JsonConvert.DeserializeObject<BookRoot>(responseBody);
+                    return bookRoot;
+
+                }
+
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
         }
     }
 }

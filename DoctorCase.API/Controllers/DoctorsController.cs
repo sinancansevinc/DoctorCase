@@ -23,10 +23,22 @@ namespace DoctorCase.API.Controllers
         public async Task<IActionResult> GetDoctors()
         {
             var doctorRoot = await _service.GetTurkishDoctorsAsync();
-
-            _service.ExportCSV(doctorRoot);
-
             return Ok(doctorRoot);
+        }
+
+        [HttpGet("ExportCSV")]
+        public async Task<IActionResult> ExportCSV()
+        {
+            try
+            {
+                await _service.ExportCSV();
+                return Ok(" The CSV file is loaded to  Outputs folder.");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+
+            }
         }
 
 
